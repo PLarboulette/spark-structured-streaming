@@ -2,9 +2,10 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
 
-object App  {
+object JsonConsumer  {
 
   def main(args: Array[String]): Unit = {
+
     val spark = SparkSession
       .builder
       .appName("test1")
@@ -12,7 +13,6 @@ object App  {
       .getOrCreate()
 
     spark.sparkContext.setLogLevel("ERROR")
-
 
     import spark.implicits._
     import org.apache.spark.sql.functions._
@@ -25,8 +25,6 @@ object App  {
         StructField("transactionamount", StringType, nullable = true)
       )
     )
-
-
 
     val kafkaDataFrame = spark
       .readStream
