@@ -1,20 +1,22 @@
+import AvroConsumer.sparkSchemaTransactions
 import io.confluent.kafka.schemaregistry.client.{CachedSchemaRegistryClient, SchemaRegistryClient}
 import io.confluent.kafka.serializers.AbstractKafkaAvroDeserializer
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericRecord
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.avro.SchemaConverters
+import org.apache.spark.sql.functions.{col, from_json}
 
 object AvroConsumer {
-  private val topic = "transactions-avro"
-  private val kafkaUrl = "localhost:9092"
   private val schemaRegistryUrl = "http://localhost:8081"
-
   private val schemaRegistryClient = new CachedSchemaRegistryClient(schemaRegistryUrl, 128)
   private val kafkaAvroDeserializer = new AvroDeserializer(schemaRegistryClient)
 
-  private val avroSchema = schemaRegistryClient.getLatestSchemaMetadata(topic + "-value").getSchema
-  private var sparkSchema = SchemaConverters.toSqlType(new Schema.Parser().parse(avroSchema))
+  private val kafkaUrl = "localhost:9092"
+
+  private val transactions = "transactions-avro"
+  private val avroTransactionsSchema = schemaRegistryClient.getLatestSchemaMetadata(transactions + "-value").getSchema
+  private val sparkSchemaTransactions = SchemaConverters.toSqlType(new Schema.Parser().parse(avroTransactionsSchema))
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
@@ -29,22 +31,21 @@ object AvroConsumer {
       DeserializerWrapper.deserializer.deserialize(bytes)
     )
 
-    val kafkaDataFrame = spark
+    val kafkaDataFrameTransactions = spark
       .readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", kafkaUrl)
-      .option("subscribe", topic)
+      .option("subscribe", transactions)
       .load()
-
-    val valueDataFrame = kafkaDataFrame.selectExpr("""deserialize(value) AS message""")
+      .selectExpr("""deserialize(value) AS message""")
+      .select(
+        from_json(col("message"), sparkSchemaTransactions.dataType).alias("transaction")
+      )
+      .select("transaction.*")
 
     import org.apache.spark.sql.functions._
 
-    val formattedDataFrame = valueDataFrame.select(
-      from_json(col("message"), sparkSchema.dataType).alias("parsed_value"))
-      .select("parsed_value.*")
-
-    formattedDataFrame
+    kafkaDataFrameTransactions
       .writeStream
       .format("console")
       .option("truncate", value = false)

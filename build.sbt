@@ -2,12 +2,10 @@ name := "spark-structured-streaming"
 
 version := "0.1"
 
-scalaVersion := "2.12.12"
-
 lazy val commonSettings = Seq(
   version := "0.1-SNAPSHOT",
   organization := "plarboulette",
-  scalaVersion := "2.10.1",
+  scalaVersion := "2.12.12",
   test in assembly := {}
 )
 
@@ -53,8 +51,6 @@ lazy val app = project
   .in(file("."))
   .settings(
     commonSettings,
-    mainClass in assembly := Some("App"),
-    assemblyJarName in assembly := "spark-streaming-example.jar",
     libraryDependencies  ++= Seq(
       "org.apache.kafka" % "kafka-clients" % "2.6.0",
       "org.apache.spark" %% "spark-sql-kafka-0-10" % "3.0.1" % "provided",
