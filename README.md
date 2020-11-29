@@ -40,8 +40,8 @@ To run the project, clone it and run :
 - `$SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1 --class "AvroConsumer" --master local ./target/scala-2.12/spark-structured-streaming.jar`. The `AvroConsumer`corresponds to the name of the Scala Consumer located in the src folder. 
 - Because of the `latest` configuration of the consumer, it will no re-read previously pushed events, so you have to re-launch the two commands of ksql-datagen. 
 - The Avro consumer read two different sources (or topics) : clients and transactions. The two topics are linked by a `clientId`field. 
-I configure a king of `join function` between the two sources, on the clientId field. 
-- If you return on the window of Spark, you will see data appear, but only when the transaction.clientId = client.clientId :) (it not the best behaviour but it's just a test, I will work to improve that)
+I configure a kind of `join function` between the two sources, on the clientId field. 
+- If you return on the window of Spark, you will see data appear, but only when the transaction.clientId = client.clientId :)
 - if you look the code, you can see a `dropDuplicates` function. We need this function to avoid the streams to become too big. Without it, it can wait 
-a long time to have two linked entities. I choose to just drop the previous entry, if two clients have the same Ids, the old one is dropped. 
-- You have another way to do it, with a king of eventTime field. You put as value the moment when you push the event, and if the event is too old, it will be remove from the stream. I think it's a better way of do what I want, I will work on that. 
+a long time to have two linked entities. I choose to just drop the previous entry, if two clients have the same Ids, the old one is dropped. (it not the best behaviour but it's just a test, I will work to improve that)
+- You have another way to do it, with a kind of `eventTime` field. You put as value the moment when you push the event, and if the event is too old, it will be remove of the stream. I think it's a better way of do what I want, I will work on that. 
