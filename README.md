@@ -35,7 +35,8 @@ To run the project, clone it and run :
 - `sbt assembly` . It will generate you a JAR which will be used by Spark. You can find it in the `target/scala-2.12` folder with the name `spark-structured-streaming.jar`.
 - `$SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1 --class "AvroConsumer" --master local ./target/scala-2.12/spark-structured-streaming.jar`. The `AvroConsumer`corresponds to the name of the Scala Consumer located in the src folder. 
 - After, we will generate some data with the ksql-datagen tool. 
-- `$CONFLUENT_HOME/bin/ksql-datagen schema=schemas/transactions.avro format=avro topic=transactions-avro key=transationid maxInterval=1000`
+- `$CONFLUENT_HOME/bin/ksql-datagen schema=schemas/transactions.avro format=avro topic=transactions-avro key=transactionid iterations=1000`
+- `$CONFLUENT_HOME/bin/ksql-datagen schema=schemas/clients.avro format=avro topic=clients-avro key=clientid iterations=1000`
 - The `transactions.avro` schema will let to ksql-datagen to create data with a specified format.
 - If you return on the window of Spark, you will see data appear. 
 

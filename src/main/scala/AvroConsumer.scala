@@ -15,8 +15,12 @@ object AvroConsumer {
   private val kafkaUrl = "localhost:9092"
 
   private val transactions = "transactions-avro"
-  private val avroTransactionsSchema = schemaRegistryClient.getLatestSchemaMetadata(transactions + "-value").getSchema
-  private val sparkSchemaTransactions = SchemaConverters.toSqlType(new Schema.Parser().parse(avroTransactionsSchema))
+  private val avroSchemaTransactions = schemaRegistryClient.getLatestSchemaMetadata(transactions + "-value").getSchema
+  private val sparkSchemaTransactions = SchemaConverters.toSqlType(new Schema.Parser().parse(avroSchemaTransactions))
+
+  private val clients = "clients-avro"
+  private val avroSchemaClients = schemaRegistryClient.getLatestSchemaMetadata(transactions + "-value").getSchema
+  private val sparkSchemaClients = SchemaConverters.toSqlType(new Schema.Parser().parse(avroSchemaClients))
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
@@ -31,21 +35,47 @@ object AvroConsumer {
       DeserializerWrapper.deserializer.deserialize(bytes)
     )
 
+    import spark.implicits._
+    import org.apache.spark.sql.functions._
+
     val kafkaDataFrameTransactions = spark
       .readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", kafkaUrl)
-      .option("subscribe", transactions)
+      .option("subscribe", s"$transactions")
       .load()
       .selectExpr("""deserialize(value) AS message""")
       .select(
-        from_json(col("message"), sparkSchemaTransactions.dataType).alias("transaction")
+        from_json(col("message"), sparkSchemaTransactions.dataType).alias("transaction"),
       )
-      .select("transaction.*")
+      .selectExpr("transaction.transactionid AS transactionId", "transaction.clientid AS clientId" )
+      .dropDuplicates(
+        "transactionId"
+      )
 
-    import org.apache.spark.sql.functions._
+    val kafkaDataFrameClients= spark
+      .readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", kafkaUrl)
+      .option("subscribe", s"$clients")
+      .load()
+      .selectExpr("""deserialize(value) AS message""")
+      .select(
+        from_json(col("message"), sparkSchemaClients.dataType).alias("client"),
+      )
+      .selectExpr("client.clientid AS clientId")
+      .as[String]
+      .dropDuplicates(
+      "clientId"
+    )
 
-    kafkaDataFrameTransactions
+    val joining = kafkaDataFrameTransactions.join(
+      kafkaDataFrameClients,
+      Seq("clientId"),
+      "inner"
+    )
+
+    joining
       .writeStream
       .format("console")
       .option("truncate", value = false)
