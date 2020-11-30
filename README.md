@@ -34,8 +34,8 @@ To run the project, run :
 To run the project, clone it and run : 
 - `sbt assembly` . It will generate you a JAR which will be used by Spark. You can find it in the `target/scala-2.12` folder with the name `spark-structured-streaming.jar`.
 - First, we need to generate some data with the ksql-datagen tool to create the schemas in the Registry. The Avro consumer and Spark need them to correctly run. 
-- `$CONFLUENT_HOME/bin/ksql-datagen schema=schemas/transactions.avro format=avro topic=transactions-avro key=transactionid iterations=1000`
-- `$CONFLUENT_HOME/bin/ksql-datagen schema=schemas/clients.avro format=avro topic=clients-avro key=clientid iterations=1000`
+- `$CONFLUENT_HOME/bin/ksql-datagen schema=schemas/transactions.avro format=avro topic=transactions-avro key=transactionid iterations=1`
+- `$CONFLUENT_HOME/bin/ksql-datagen schema=schemas/clients.avro format=avro topic=clients-avro key=clientid iterations=1`
 - Now, we can launch the consumer 
 - `$SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1 --class "AvroConsumer" --master local ./target/scala-2.12/spark-structured-streaming.jar`. The `AvroConsumer`corresponds to the name of the Scala Consumer located in the src folder. 
 - Because of the `latest` configuration of the consumer, it will no re-read previously pushed events, so you have to re-launch the two commands of ksql-datagen. 
