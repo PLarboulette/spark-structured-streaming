@@ -19,7 +19,7 @@ Clone the repository of this project.
 You need to run the Kafka cluster.
 Use `docker-compose -f docker-compose.yml up`
 
-## How tu run the JSON version 
+## How to run the JSON version 
 
 To run the project, run : 
 - `sbt package` . It will generate you a JAR which will be used by Spark. You can find it in the `target/scala-2.12` folder with the name `spark-structured-streaming_2.12-0.1.jar`.
