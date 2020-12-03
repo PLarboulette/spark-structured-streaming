@@ -53,3 +53,9 @@ Some scripts are available in the `scripts` folder. For example, to add transact
 
 For Avro consumer, just replace `json` by `avro`. 
 
+
+## How tu run the PostgreSQL version
+- First, we need the PostgreSQL driver (can be found [here](https://jdbc.postgresql.org/download.html)). I use in this repository the 42.2.18 version.
+- I put the JAR at the root of the repository
+- After, I use a tool called [pgcli](https://www.pgcli.com/) to create my table and to insert data. The command lines can be found in the script folder. 
+- After, go to script and launch `execute-postgresql-consumer.sh`. 
