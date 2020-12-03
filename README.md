@@ -45,3 +45,11 @@ I configure a kind of `join function` between the two sources, on the clientId f
 - if you look the code, you can see a `dropDuplicates` function. We need this function to avoid the streams to become too big. Without it, it can wait 
 a long time to have two linked entities. I choose to just drop the previous entry, if two clients have the same Ids, the old one is dropped. (it not the best behaviour but it's just a test, I will work to improve that)
 - You have another way to do it, with a kind of `eventTime` field. You put as value the moment when you push the event, and if the event is too old, it will be remove of the stream. I think it's a better way of do what I want, I will work on that. 
+
+## Scripts 
+
+Some scripts are available in the `scripts` folder. For example, to add transactions for the JSON consumer, you can use (since the `scripts` folder) : 
+ - `sh transactions.sh json` 
+
+For Avro consumer, just replace `json` by `avro`. 
+
