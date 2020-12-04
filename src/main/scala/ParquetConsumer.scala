@@ -11,10 +11,14 @@ object ParquetConsumer {
     // It just be used to generate new files
     val uuid = UUID.randomUUID().toString
 
-    val data = Seq(
+    val dataHeroes = Seq(
       (1,"Batman", 34),
       (2,"Superman", 42),
       (3,"Wonder Woman", 25)
+    )
+
+    val dataCities = Seq(
+      (1, "Metropolis", 2)
     )
 
     val spark = SparkSession
@@ -24,22 +28,32 @@ object ParquetConsumer {
       .getOrCreate()
 
     import spark.sqlContext.implicits._
-    val dataSet = data.toDS()
-    val dateFrame = dataSet.toDF("clientId","name","age")
+    val dataHeroesSet = dataHeroes.toDS()
+    val dataHeroesFrame = dataHeroesSet.toDF("id","name","age")
+
+    val dataCitiesSet = dataCities.toDS()
+    val dataCitiesFrame = dataCitiesSet.toDF("id", "name", "heroId")
 
     // Just writing the data in a temporary file
-    dateFrame.write.parquet(s"/tmp/output/clients.parquet-$uuid")
-    val read = spark.read.parquet(s"/tmp/output/clients.parquet-$uuid")
-    read.createOrReplaceTempView("ParquetTable")
-    val parkSQL = spark.sql("select * from ParquetTable where age <= 27")
-      .select("clientId", "name", "age")
+    dataHeroesFrame.write.parquet(s"/tmp/output/heroes.parquet-$uuid")
+    dataCitiesFrame.write.parquet(s"/tmp/output/cities.parquet-$uuid")
 
-    parkSQL
+    val readHeroes = spark.read.parquet(s"/tmp/output/heroes.parquet-$uuid")
+    val readCities = spark.read.parquet(s"/tmp/output/cities.parquet-$uuid")
+
+
+    readHeroes.createOrReplaceTempView("heroes")
+    readCities.createOrReplaceTempView("cities")
+
+    val sparkSQL = spark.sql("select * from heroes JOIN cities where age >= 41 AND heroes.id == cities.heroId")
+      .select("heroes.id", "heroes.name", "heroes.age", "cities.name")
+
+    sparkSQL
       .write
       .format("console")
       .option("truncate", value = false)
       .save()
 
-    // It should print the data for Wonder Woman
+    // It should print the data for SuperMan (age == 41 and city Metropolis)
   }
 }
