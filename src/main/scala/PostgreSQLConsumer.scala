@@ -6,7 +6,7 @@ object PostgreSQLConsumer {
 
     val spark = SparkSession
       .builder
-      .appName("test3")
+      .appName("PostgreSQLConsumer")
       .master("local")
       .getOrCreate()
 

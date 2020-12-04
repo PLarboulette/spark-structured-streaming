@@ -25,7 +25,7 @@ object AvroConsumer {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
       .builder
-      .appName("ConfluentConsumer")
+      .appName("AvroConsumer")
       .master("local")
       .getOrCreate()
 

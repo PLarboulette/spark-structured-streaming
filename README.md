@@ -1,6 +1,6 @@
 # spark-structured-streaming 
 
-Little project to play with Spark Structured Streaming, Scala, Avro and Kafka 
+Little project to play with Spark Structured Streaming, Scala, Avro and Kafka, PostgreSQL. 
 
 ## Tools
 
@@ -29,7 +29,7 @@ To run the project, run :
 - The `transactions.avro` schema will let to ksql-datagen to create data with a specified format.
 - If you return on the window of Spark, you will see data appear. 
 
-## How tu run the AVRO version 
+## How to run the AVRO version 
 
 To run the project, clone it and run : 
 - `sbt assembly` . It will generate you a JAR which will be used by Spark. You can find it in the `target/scala-2.12` folder with the name `spark-structured-streaming.jar`.
@@ -54,8 +54,15 @@ Some scripts are available in the `scripts` folder. For example, to add transact
 For Avro consumer, just replace `json` by `avro`. 
 
 
-## How tu run the PostgreSQL version
+## How to run the PostgreSQL version
 - First, we need the PostgreSQL driver (can be found [here](https://jdbc.postgresql.org/download.html)). I use in this repository the 42.2.18 version.
 - I put the JAR at the root of the repository
 - After, I use a tool called [pgcli](https://www.pgcli.com/) to create my table and to insert data. The command lines can be found in the script folder. 
 - After, go to script and launch `execute-postgresql-consumer.sh`. 
+
+## How to run the Parquet version 
+
+- First, yu need 9 JARS. The list can be found in the file `execute-parquet-consumer.sh` and get them on Maven repository. I put them in a `jars` folder. If you want put them in another folder, don't forget to update the path in the script (the `jars/XXX` of each jar) 
+- After that, you just have to run the script `execute-parquet-consumer.sh`. 
+- We can play with the Data (in the Seq `data` in the `ParquetConsumer` Scala file) to add more data or update it. We also can play we the SQL requests. 
+- I had some problems of compilation with the `toDf` and to `toDs` functions. It seems the position of the import of the implicits has an importance, I can't understand it for the moment, but I continue to search :) 

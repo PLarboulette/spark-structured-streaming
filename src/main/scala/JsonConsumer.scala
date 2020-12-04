@@ -8,7 +8,7 @@ object JsonConsumer  {
 
     val spark = SparkSession
       .builder
-      .appName("test1")
+      .appName("JSsonConsumer")
       .master("local")
       .getOrCreate()
 
