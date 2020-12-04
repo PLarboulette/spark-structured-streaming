@@ -64,5 +64,5 @@ For Avro consumer, just replace `json` by `avro`.
 
 - First, yu need 9 JARS. The list can be found in the file `execute-parquet-consumer.sh` and get them on Maven repository. I put them in a `jars` folder. If you want put them in another folder, don't forget to update the path in the script (the `jars/XXX` of each jar) 
 - After that, you just have to run the script `execute-parquet-consumer.sh`. 
-- We can play with the Data (in the Seq `data` in the `ParquetConsumer` Scala file) to add more data or update it. We also can play we the SQL requests. 
+- We can play with the Data (in the Seq `dataHeroes` and/or `dataCities` in the `ParquetConsumer` Scala file) to add more data or update it. We also can play we the SQL requests. 
 - I had some problems of compilation with the `toDf` and to `toDs` functions. It seems the position of the import of the implicits has an importance, I can't understand it for the moment, but I continue to search :) 
